@@ -92,8 +92,7 @@ public class ExampleExceptions {
             System.out.println("Specific: " + e.getMessage());
         } catch (RuntimeException e) {
             // General — prinde ORICE RuntimeException care nu a fost deja prinsă
-            System.out.println("General: " + e.getMessage());
-        }
+            System.out.println("General: " + e.getMessage()); }
 
         // === 6. Prindere și re-aruncare ===
         System.out.println("\n=== 6. Prindere și re-aruncare ===");
