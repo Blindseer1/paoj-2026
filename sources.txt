@@ -1,0 +1,10 @@
+src/com/pao/test/DiffGenerator.java
+src/com/pao/test/IOTest.java
+src/com/pao/project/util/DatabaseConnection.java
+src/com/pao/project/service/AuditService.java
+src/com/pao/project/service/ContService.java
+src/com/pao/project/repository/Repository.java
+src/com/pao/project/repository/UtilizatorRepository.java
+src/com/pao/project/repository/TranzactieRepository.java
+src/com/pao/project/repository/ContRepository.java
+src/com/pao/project/repository/CardRepository.java
