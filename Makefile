@@ -41,7 +41,7 @@ copy-resources:
 
 # Boots your banking application
 run: compile copy-resources
-	java -cp $(CLASSPATH) com.pao.project.Main
+	java -cp $(CLASSPATH) com.pao.project.banking.Main
 
 clean:
 	rm -rf $(OUT_DIR)

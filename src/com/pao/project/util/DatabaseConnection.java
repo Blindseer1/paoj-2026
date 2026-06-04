@@ -36,7 +36,6 @@ public class DatabaseConnection {
 
     public Connection getConnection() {
         try {
-            // Reconnect if the connection was closed / timed out
             if (connection == null || connection.isClosed()) {
                 instance = new DatabaseConnection();
                 return instance.connection;

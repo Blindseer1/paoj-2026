@@ -6,13 +6,8 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Singleton thread-safe care logheaza fiecare actiune in audit.csv.
- * Formatul unui rand: nume_actiune,timestamp
- */
 public class AuditService {
 
-    // ── Cele 10 actiuni definite in Etapa I ──────────────────────────────────
     public static final String ADAUGA_UTILIZATOR        = "adauga_utilizator";
     public static final String DESCHIDE_CONT_CURENT     = "deschide_cont_curent";
     public static final String DESCHIDE_CONT_ECONOMII   = "deschide_cont_economii";
@@ -30,7 +25,6 @@ public class AuditService {
     private final ReentrantLock lock = new ReentrantLock();
 
     private AuditService() {
-        // fisierul se creeaza daca nu exista; se deschide in append la fiecare scriere
     }
 
     public static AuditService getInstance() {
@@ -40,12 +34,6 @@ public class AuditService {
         return instance;
     }
 
-    /**
-     * Logheaza o actiune in audit.csv.
-     * Thread-safe prin ReentrantLock.
-     *
-     * @param numeleActiunii una dintre constantele definite mai sus
-     */
     public void log(String numeleActiunii) {
         lock.lock();
         try (PrintWriter pw = new PrintWriter(new FileWriter(CSV_PATH, true))) {

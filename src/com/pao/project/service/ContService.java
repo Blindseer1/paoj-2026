@@ -16,7 +16,6 @@ public class ContService {
 
     private static ContService instance;
 
-    // Stage II Repositories 
     private final ContRepository contRepository;
     private final TranzactieRepository tranzactieRepository;
     private final CardRepository cardRepository;
@@ -34,16 +33,13 @@ public class ContService {
         return instance;
     }
 
-    // Generates a unique secure transaction ID instead of an unstable local counter
     private String genereazaIdTranzactie() {
         return "TRX-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
-    // ── Actiunea 2 / 3: Deschide Cont ────────────────────────────────────────
     public void adaugaCont(Cont cont, String utilizatorId) {
         if (cont == null) throw new IllegalArgumentException("Contul nu poate fi null.");
         
-        // Pushes data straight to MySQL
         contRepository.save(cont, utilizatorId);
 
         if (cont instanceof ContCurent) {
@@ -56,7 +52,7 @@ public class ContService {
     }
 
     public void stergeCont(String iban) throws ContNegasitException {
-        cautaDupaIban(iban); // Validates presence first to throw exception if missing
+        cautaDupaIban(iban); 
         contRepository.delete(iban);
         System.out.println("[ContService] Cont sters din baza de date: " + iban);
     }
@@ -70,7 +66,6 @@ public class ContService {
         return contRepository.findAll();
     }
 
-    // ── Actiunea 6: Depune Bani ──────────────────────────────────────────────
     public void depune(String iban, double suma) throws ContNegasitException {
         if (suma <= 0) throw new IllegalArgumentException("Suma de depus trebuie sa fie pozitiva.");
         Cont cont = cautaDupaIban(iban);
@@ -89,7 +84,6 @@ public class ContService {
                 suma, iban, cont.getSold());
     }
 
-    // ── Actiunea 7: Retrage Bani ─────────────────────────────────────────────
     public void retrage(String iban, double suma)
             throws ContNegasitException, FonduriInsuficienteException {
         if (suma <= 0) throw new IllegalArgumentException("Suma de retras trebuie sa fie pozitiva.");
@@ -120,7 +114,6 @@ public class ContService {
                 suma, iban, cont.getSold());
     }
 
-    // ── Actiunea 8: Explicit JDBC Transaction (Transfer) ─────────────────────
     public void transfer(String ibanSursa, String ibanDestinatie, double suma)
             throws ContNegasitException, FonduriInsuficienteException {
         if (suma <= 0) throw new IllegalArgumentException("Suma de transferat trebuie sa fie pozitiva.");
@@ -143,7 +136,6 @@ public class ContService {
                 "Transfer primit de la " + ibanSursa, Tranzactie.TipTranzactie.TRANSFER);
 
         try {
-            // Triggers your custom explicit multi-table database transaction block
             tranzactieRepository.executeazaTransfer(tSursa, tDest, suma);
             
             AuditService.getInstance().log(AuditService.TRANSFER);
@@ -155,9 +147,7 @@ public class ContService {
         }
     }
 
-    // ── Actiunea 4 / 5: Emite Card ───────────────────────────────────────────
     public void emiteCard(String iban, Card card) throws ContNegasitException {
-        // Validation check ensures account exists to satisfy the "Fara NullPointerException" rule
         cautaDupaIban(iban); 
         
         cardRepository.save(card, iban);
@@ -171,14 +161,12 @@ public class ContService {
         System.out.println("[ContService] Card salvat in baza de date pentru " + iban + ": " + card);
     }
 
-    // ── Actiunea 9: Genereaza Extras Cont ────────────────────────────────────
     public ExtrasCont genereazaExtras(String iban, LocalDate dataStart, LocalDate dataFinal)
             throws ContNegasitException {
         Cont cont = cautaDupaIban(iban); 
         
         ExtrasCont extras = new ExtrasCont(iban, dataStart, dataFinal, cont.getSold());
 
-        // Queries the cold database storage dynamically to gather operational logs
         for (Tranzactie t : tranzactieRepository.findAll()) {
             if (iban.equals(t.getIbanSursa()) || iban.equals(t.getIbanDestinatie())) {
                 LocalDate dataTranzactie = t.getData().toLocalDate();
